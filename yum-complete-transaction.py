@@ -137,6 +137,9 @@ class YumCompleteTransaction(YumUtilBase):
         self.optparser_grp.add_option("--cleanup-only", default=False,
             action="store_true", dest="cleanup",
             help='Do not complete the transaction just clean up transaction journals')
+	self.optparser_grp.add_option("--dry-run", default=False,
+	    action="store_true", dest="dry_run",
+	    help="Do not take effect, just print the actions to be taken.")
 
     def main(self):
         # Parse the commandline option and setup the basics.
@@ -178,7 +181,8 @@ class YumCompleteTransaction(YumUtilBase):
             # nuke ts files in yumlibpath
             for timestamp in times:
                 print "Cleaning up %s" % timestamp
-                self.clean_up_ts_files(timestamp, self.conf.persistdir)
+                if not opts.dry_run:
+                    self.clean_up_ts_files(timestamp, self.conf.persistdir)
             sys.exit()
 
 
@@ -193,6 +197,10 @@ class YumCompleteTransaction(YumUtilBase):
             sys.exit(1)
             
         print "The remaining transaction had %d elements left to run" % len(remaining)
+        if opts.dry_run:
+            for (action, pkgspec) in remaining:
+                print "%s: %s" % (action, pkgspec)
+            sys.exit()
         for (action, pkgspec) in remaining:
             if action == 'install':
                 try:
