@@ -109,7 +109,7 @@ def posttrans_hook(conduit):
 
     for (a_k, a_s, a_c) in action_tuples:
         #print 'if %s in state %s the run %s' %( a_k, a_s, a_c)
-        if a_s  == 'update':
+        if a_s  in [ 'update', 'upgrade' ]:
             pkgset = updates
         elif a_s == 'install':
             pkgset = installs
